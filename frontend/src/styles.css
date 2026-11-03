@@ -704,8 +704,35 @@ button.secondary:hover {
 }
 
 .pie-chart {
+  position: relative;
   height: 270px;
   min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.pie-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pie-center span {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.pie-center strong {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .chart-legend {
@@ -771,6 +798,10 @@ button.secondary:hover {
   height: 370px;
   margin-top: 20px;
   min-width: 0;
+  padding: 14px 12px 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
 }
 
 .category-create {

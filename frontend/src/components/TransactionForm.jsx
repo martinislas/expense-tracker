@@ -3,13 +3,13 @@ import { api } from '../api';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export default function TransactionForm({ categories, onCreated }) {
+export default function TransactionForm({ categories, assets = [], onCreated }) {
   const [form, setForm] = useState({
     date: today(),
     description: '',
     amount: '',
     category: '',
-    kind: 'expense' // 'expense' | 'income', flips the sign of amount
+    kind: 'expense' // 'expense' | 'income' | 'transfer'; expense and transfer are negative
   });
   const [error, setError] = useState('');
 
@@ -22,15 +22,22 @@ export default function TransactionForm({ categories, onCreated }) {
       setError('Description and amount are required.');
       return;
     }
+    const isTransfer = form.kind === 'transfer';
+    if (isTransfer && !form.category.startsWith('asset:')) {
+      setError('Choose the asset to transfer to.');
+      return;
+    }
     const magnitude = Math.abs(parseFloat(form.amount));
-    const signedAmount = form.kind === 'expense' ? -magnitude : magnitude;
+    const signedAmount = form.kind === 'income' ? magnitude : -magnitude;
 
+    const isAsset = form.category.startsWith('asset:');
     try {
       await api.createTransaction({
         date: form.date,
         description: form.description.trim(),
         amount: signedAmount,
-        category: form.category || null
+        category: isAsset ? null : form.category || null,
+        asset: isAsset ? form.category.slice(6) : null
       });
       setForm({ date: today(), description: '', amount: '', category: '', kind: 'expense' });
       onCreated();
@@ -51,9 +58,10 @@ export default function TransactionForm({ categories, onCreated }) {
           style={{ flex: 1, minWidth: 160 }}
           required
         />
-        <select value={form.kind} onChange={update('kind')}>
+        <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value, category: '' })}>
           <option value="expense">Expense</option>
           <option value="income">Income</option>
+          <option value="transfer">Transfer to asset</option>
         </select>
         <input
           type="number"
@@ -64,13 +72,22 @@ export default function TransactionForm({ categories, onCreated }) {
           style={{ width: 110 }}
           required
         />
-        <select value={form.category} onChange={update('category')}>
-          <option value="">No category</option>
-          {categories.map((c) => (
-            <option key={c._id} value={c._id}>
-              {c.name}
-            </option>
-          ))}
+        <select value={form.category} onChange={update('category')} required={form.kind === 'transfer'}>
+          {form.kind === 'transfer' ? (
+            <>
+              <option value="">Select asset…</option>
+              {assets.map((a) => (
+                <option key={a._id} value={`asset:${a._id}`}>{a.name}</option>
+              ))}
+            </>
+          ) : (
+            <>
+              <option value="">No category</option>
+              {categories.map((c) => (
+                <option key={c._id} value={c._id}>{c.name}</option>
+              ))}
+            </>
+          )}
         </select>
         <button type="submit">Add</button>
       </div>

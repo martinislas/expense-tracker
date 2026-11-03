@@ -114,12 +114,15 @@ export default function Assets() {
                 step="0.01"
                 value={draft.value ?? ''}
                 onChange={(e) => set({ value: e.target.value })}
+                placeholder="Base value"
+                title="Base value, excluding cash transferred from transactions"
                 aria-label={`Value for ${asset.name}`}
               />
               <div>
-                {asset.contributions !== 0 && (
-                  <div className="meta">Worth {fmt(asset.currentValue)} incl. {fmt(asset.contributions)} transferred</div>
-                )}
+                <div className="meta">
+                  Current worth {fmt(asset.currentValue)}
+                  {asset.contributions !== 0 && ` (base value + ${fmt(asset.contributions)} transferred)`}
+                </div>
                 <button onClick={() => run(() => api.updateAsset(asset._id, { ...draft, value: Number(draft.value) }), 'Asset saved.')}>
                   Save
                 </button>{' '}

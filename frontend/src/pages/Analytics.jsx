@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  CartesianGrid,
   Cell,
   Line,
   LineChart,
@@ -237,14 +238,31 @@ export default function Analytics() {
                 <div className="pie-chart">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData} dataKey="spent" nameKey="name" outerRadius="88%">
+                      <Pie
+                        data={pieData}
+                        dataKey="spent"
+                        nameKey="name"
+                        innerRadius="60%"
+                        outerRadius="82%"
+                        paddingAngle={3}
+                        cornerRadius={4}
+                        stroke="var(--surface)"
+                        strokeWidth={3}
+                      >
                         {pieData.map((category) => (
                           <Cell key={category.categoryId || 'uncategorized'} fill={category.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => money(value)} />
+                      <Tooltip
+                        formatter={(value) => money(value)}
+                        contentStyle={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 4, boxShadow: '0 8px 24px rgba(35, 41, 31, 0.12)' }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
+                  <div className="pie-center">
+                    <span>Total spent</span>
+                    <strong>{money(summary?.expenses || 0)}</strong>
+                  </div>
                 </div>
                 <div className="chart-legend">
                   {pieData.map((category) => (
@@ -286,9 +304,14 @@ export default function Analytics() {
               <div className="trend-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trendChartData} margin={{ top: 12, right: 20, left: 8, bottom: 8 }}>
-                    <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={24} />
-                    <YAxis tickFormatter={(value) => `$${value}`} tickLine={false} axisLine={false} width={68} />
-                    <Tooltip formatter={(value) => money(value)} />
+                    <CartesianGrid vertical={false} stroke="var(--line)" strokeDasharray="3 5" />
+                    <XAxis dataKey="label" tick={{ fill: 'var(--ink-soft)', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={24} />
+                    <YAxis tick={{ fill: 'var(--ink-soft)', fontSize: 11 }} tickFormatter={(value) => `$${value}`} tickLine={false} axisLine={false} width={68} />
+                    <Tooltip
+                      formatter={(value) => money(value)}
+                      contentStyle={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 4, boxShadow: '0 8px 24px rgba(35, 41, 31, 0.12)' }}
+                      labelStyle={{ color: 'var(--ink)', fontWeight: 600 }}
+                    />
                     {trend.categories.map((category) => (
                       <Line
                         key={category.id}

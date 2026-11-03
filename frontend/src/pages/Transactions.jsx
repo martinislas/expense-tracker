@@ -123,7 +123,7 @@ export default function Transactions() {
       <h1 className="page-title">Transactions</h1>
       <p className="page-subtitle">Edit any transaction or assign its category directly from the list.</p>
 
-      <TransactionForm categories={categories} onCreated={load} />
+      <TransactionForm categories={categories} assets={assets} onCreated={load} />
 
       {error && <div className="status-msg error">{error}</div>}
       {message && !error && <div className="status-msg success">{message}</div>}
@@ -199,9 +199,11 @@ export default function Transactions() {
                   <div className="ledger-date">{fmtDate(t.date)}</div>
                   <div className="ledger-desc">
                     <div className="title">{t.description}</div>
-                    <div className="meta">{t.source === 'import' ? 'Imported statement' : 'Manual transaction'}</div>
+                    <div className="meta">
+                      {t.asset ? `Transfer to ${t.asset.name} (not an expense)` : t.source === 'import' ? 'Imported statement' : 'Manual transaction'}
+                    </div>
                   </div>
-                  <div className={`ledger-amount ${t.amount >= 0 ? 'income' : 'expense'}`}>
+                  <div className={`ledger-amount ${t.asset ? '' : t.amount >= 0 ? 'income' : 'expense'}`}>
                     {fmt(t.amount)}
                   </div>
                   <select
